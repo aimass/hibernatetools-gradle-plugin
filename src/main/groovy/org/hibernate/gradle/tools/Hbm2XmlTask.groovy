@@ -37,20 +37,20 @@ import org.gradle.api.tasks.TaskAction
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-class Hbm2JavaTask  extends DefaultTask{
+class Hbm2XmlTask extends DefaultTask{
     def Config  config
     def boolean enabled     = true
-    def String  description = "Generate java classes"
+    def String  description = "Generate XML hbm Files"
     def String  group       = "hibernatetools"
 
     @TaskAction
     def run(){
         Task compileJava = project.getTasksByName('compileJava',false).iterator().next()
-        compileJava.dependsOn('hbm2java')
-        hbm2java(project)
+        compileJava.dependsOn('hbm2xml')
+        hbm2xml(project)
     }
 
-    def hbm2java(final Project project){
+    def hbm2xml(final Project project){
         //reversestrategy must not be provided if it is null
         def preparedJdbcConfiguration = [
                 configurationfile:  "${config.hibernateConfigXml.path}",
@@ -66,12 +66,9 @@ class Hbm2JavaTask  extends DefaultTask{
                     classname: "org.hibernate.tool.ant.HibernateToolTask",
                     classpath: config.classPath
             )
-            hibernatetool( destdir : config.javaSrcGeneratedDir, templatepath : 'templates') {
+            hibernatetool( destdir : config.javaSrcGeneratedDir, templatepath : 'templates' ) {
                 jdbcconfiguration(preparedJdbcConfiguration)
-                hbm2java(
-                        jdk5: true,
-                        ejb3: true
-                )
+                hbm2hbmxml()
                 classpath {
                     pathelement( path: "config" )
                 }
